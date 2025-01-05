@@ -50,7 +50,7 @@ public class RobotContainer {
     public RobotContainer() {
         driverController = new XboxController(0);
 
-        String swerveDirectory = "swerve/infinity";
+        String swerveDirectory = "swerve/kitbot";
         //subsystems used in all robots
         swerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), swerveDirectory));
         leds = new LedSubsystem(0, 10);
