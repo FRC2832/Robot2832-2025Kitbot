@@ -56,7 +56,7 @@ public class RobotContainer {
         String swerveDirectory = "swerve/kitbot";
         //subsystems used in all robots
         swerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), swerveDirectory));
-        leds = new LedSubsystem(0, 10);
+        leds = new LedSubsystem(6, 54);
         rampSubsystem = new RampSubsystem();
         swerveDrive.setMaximumSpeed(1, Math.PI/2);
 
@@ -110,7 +110,7 @@ public class RobotContainer {
 
         //setup default commands that are used for driving
         swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-        leds.setDefaultCommand(new RainbowLeds(leds));
+        leds.setDefaultCommand(new RainbowLeds(leds).ignoringDisable(true));
         rampSubsystem.setDefaultCommand(rampSubsystem.runMotor(() -> (driverController.getRightTriggerAxis() * 0.35) - (driverController.getLeftTriggerAxis() * 0.35)));
     }
 
