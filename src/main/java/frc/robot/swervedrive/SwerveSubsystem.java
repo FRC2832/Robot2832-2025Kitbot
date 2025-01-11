@@ -466,12 +466,14 @@ public class SwerveSubsystem extends SubsystemBase
         redFlip = -1;
       }
       // Make the robot move
-      swerveDrive.drive(new Translation2d(
-                            translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity() * redFlip,
-                            translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity() * redFlip),
-                            angularRotationX.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity(),
-                        true,
-                        true);
+      var translation = new Translation2d(
+        translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity() * redFlip,
+        translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity() * redFlip);
+      var rotation = angularRotationX.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity();
+      ChassisSpeeds velocity = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
+      var heading = swerveDrive.getOdometryHeading();
+      velocity = ChassisSpeeds.fromFieldRelativeSpeeds(velocity, heading);
+      swerveDrive.drive(velocity, true, new Translation2d());
     }).withName("DriveCommand");
   }
 
