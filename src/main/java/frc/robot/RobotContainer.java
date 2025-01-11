@@ -41,45 +41,33 @@ import frc.robot.vision.Vision;
  */
 public class RobotContainer {
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
-    //private SwerveSubsystem swerveDrive;
+    private SwerveSubsystem swerveDrive;
     private RampSubsystem rampSubsystem;
     private LedSubsystem leds;
-    //private Vision vision;
+    private Vision vision;
 
     private XboxController driverController;
 
-    //private SendableChooser<Command> autoChooser;
+    private SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
         driverController = new XboxController(0);
 
         String swerveDirectory = "swerve/kitbot";
         //subsystems used in all robots
-        //swerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), swerveDirectory));
+        swerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), swerveDirectory));
         leds = new LedSubsystem(0, 10);
         rampSubsystem = new RampSubsystem();
+        swerveDrive.setMaximumSpeed(1, Math.PI/2);
 
-        //vision = new Vision(swerveDrive);
-        //vision.addCamera(new AprilTagCamera("left",
-        //    new Rotation3d(0, Math.toRadians(-24.094), Math.toRadians(30)),
-        //    new Translation3d(Units.inchesToMeters(12.056),
-        //                    Units.inchesToMeters(10.981),
-        //                    Units.inchesToMeters(8.44)),
-        //    VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)));
-//
-        //vision.addCamera(new AprilTagCamera("right",
-        //    new Rotation3d(0, Math.toRadians(-24.094), Math.toRadians(-30)),
-        //    new Translation3d(Units.inchesToMeters(12.056),
-        //                    Units.inchesToMeters(-10.981),
-        //                    Units.inchesToMeters(8.44)),
-        //    VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)));
-//
-        //vision.addCamera(new AprilTagCamera("center",
-        //    new Rotation3d(0, Units.degreesToRadians(-18), Math.toRadians(180)),
-        //    new Translation3d(Units.inchesToMeters(-4.628),
-        //                        Units.inchesToMeters(-10.687),
-        //                        Units.inchesToMeters(16.129)),
-        //    VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)));
+        vision = new Vision(swerveDrive);
+        /* vision.addCamera(new AprilTagCamera("center",
+            new Rotation3d(0, Units.degreesToRadians(-18), Math.toRadians(180)),
+            new Translation3d(Units.inchesToMeters(-4.628),
+                                Units.inchesToMeters(-10.687),
+                                Units.inchesToMeters(16.129)),
+            VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)));
+``      */
 
         //add some buttons to press for development
         /*
@@ -96,8 +84,8 @@ public class RobotContainer {
         NamedCommands.registerCommand("flashBlue", new LightningFlash(leds, Color.kFirstBlue));
 
         // Build an auto chooser. This will use Commands.none() as the default option.
-        //autoChooser = AutoBuilder.buildAutoChooser();
-        //SmartDashboard.putData("Auto Chooser", autoChooser);
+        autoChooser = AutoBuilder.buildAutoChooser();
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     /**
@@ -115,15 +103,15 @@ public class RobotContainer {
         // controls are front-left positive
         // left stick controls translation
         // right stick controls the angular velocity of the robot
-        //Command driveFieldOrientedAnglularVelocity = swerveDrive.driveCommand(
-        //    () -> MathUtil.applyDeadband(driverController.getLeftY() * -1, 0.05),
-        //    () -> MathUtil.applyDeadband(driverController.getLeftX() * -1, 0.05),
-        //    () -> driverController.getRightX() * -1);
+        Command driveFieldOrientedAnglularVelocity = swerveDrive.driveCommand(
+            () -> MathUtil.applyDeadband(driverController.getLeftY() * -1, 0.05),
+            () -> MathUtil.applyDeadband(driverController.getLeftX() * -1, 0.05),
+            () -> driverController.getRightX() * -1);
 
         //setup default commands that are used for driving
-        //swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+        swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
         leds.setDefaultCommand(new RainbowLeds(leds));
-        rampSubsystem.setDefaultCommand(rampSubsystem.runMotor(() -> (driverController.getRightTriggerAxis() * 0.5) - (driverController.getLeftTriggerAxis() * 0.5)));
+        rampSubsystem.setDefaultCommand(rampSubsystem.runMotor(() -> (driverController.getRightTriggerAxis() * 0.35) - (driverController.getLeftTriggerAxis() * 0.35)));
     }
 
     /**
@@ -132,7 +120,6 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        //return autoChooser.getSelected();
-        return new InstantCommand();
+        return autoChooser.getSelected();
     }
 }

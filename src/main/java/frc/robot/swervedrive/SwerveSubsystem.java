@@ -435,8 +435,7 @@ public class SwerveSubsystem extends SubsystemBase
    */
   public void setMaximumSpeed(double maximumSpeedInMetersPerSecond, double maxRotationalVelocityRadiansPerSecond )
   {
-    swerveDrive.setMaximumSpeeds(maximumSpeedInMetersPerSecond,maxRotationalVelocityRadiansPerSecond
-                                );
+    swerveDrive.setMaximumAllowableSpeeds(maximumSpeedInMetersPerSecond, maxRotationalVelocityRadiansPerSecond);
   }
 
   /**
@@ -467,12 +466,12 @@ public class SwerveSubsystem extends SubsystemBase
         redFlip = -1;
       }
       // Make the robot move
-      swerveDrive.drive(SwerveMath.scaleTranslation(new Translation2d(
+      swerveDrive.drive(new Translation2d(
                             translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity() * redFlip,
-                            translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity() * redFlip), 0.8),
-                        Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisAngularVelocity(),
+                            translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity() * redFlip),
+                            angularRotationX.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity(),
                         true,
-                        false);
+                        true);
     }).withName("DriveCommand");
   }
 
