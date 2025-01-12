@@ -16,6 +16,8 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
@@ -25,7 +27,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ramp.RampSubsystem;
@@ -58,16 +59,29 @@ public class RobotContainer {
         swerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), swerveDirectory));
         leds = new LedSubsystem(6, 54);
         rampSubsystem = new RampSubsystem();
-        swerveDrive.setMaximumSpeed(1, Math.PI/2);
+        if(Robot.isSimulation()) {
+            //drive fast in simulation
+            swerveDrive.setMaximumSpeed(5, Math.PI);
+            //start in red zone since simulation defaults to red 1 station to make field oriented easier
+            swerveDrive.resetOdometry(new Pose2d(16.28, 4.03,Rotation2d.fromDegrees(180)));
+        }
+        else {
+            swerveDrive.setMaximumSpeed(1, Math.PI/2);
+        }
 
         vision = new Vision(swerveDrive);
-        /* vision.addCamera(new AprilTagCamera("center",
-            new Rotation3d(0, Units.degreesToRadians(-18), Math.toRadians(180)),
-            new Translation3d(Units.inchesToMeters(-4.628),
-                                Units.inchesToMeters(-10.687),
-                                Units.inchesToMeters(16.129)),
+        vision.addCamera(new AprilTagCamera("front",
+            new Rotation3d(0, Units.degreesToRadians(0), Math.toRadians(0)),
+            new Translation3d(0.363,
+                                0,
+                                0.31),
             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)));
-``      */
+        vision.addCamera(new AprilTagCamera("rear",
+            new Rotation3d(0, Units.degreesToRadians(-20), Math.toRadians(0)),
+            new Translation3d(-0.363,
+                                0,
+                                0.5),
+            VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)));
 
         //add some buttons to press for development
         /*
