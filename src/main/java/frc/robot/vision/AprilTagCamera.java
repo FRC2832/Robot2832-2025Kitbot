@@ -9,8 +9,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
-//import org.littletonrobotics.junction.AutoLogOutput;
-//import org.littletonrobotics.junction.AutoLogOutputManager;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -92,7 +92,7 @@ public class AprilTagCamera {
     /**
      * Last read from the camera timestamp to prevent lag due to slow data fetches.
      */
-    //@AutoLogOutput(key = "Camera {name}/lastReadTimestamp")
+    @AutoLogOutput(key = "Camera {name}/lastReadTimestamp")
     private       double                       lastReadTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
 
     @SuppressWarnings("unused")
@@ -119,7 +119,7 @@ public class AprilTagCamera {
             Matrix<N3, N1> singleTagStdDevs, Matrix<N3, N1> multiTagStdDevsMatrix)
     {
       this.name = name;
-      //AutoLogOutputManager.addObject(this);
+      AutoLogOutputManager.addObject(this);
 
       latencyAlert = new Alert("'" + name + "' Camera is experiencing high latency.", AlertType.kWarning);
       disconnectAlert = new Alert("'" + name + "' Camera is disconnected.", AlertType.kError);
@@ -368,12 +368,12 @@ public class AprilTagCamera {
       }
     }
 
-    //@AutoLogOutput(key = "Camera {name}/hasTarget")
+    @AutoLogOutput(key = "Camera {name}/hasTarget")
     public boolean hasTarget() {
       return !resultsList.isEmpty();
     }
 
-    //@AutoLogOutput(key = "Camera {name}/isConnected")
+    @AutoLogOutput(key = "Camera {name}/isConnected")
     public boolean isConnected() {
       //if we have never seen the camera yet, or if the disconnect alert goes active
       return !(lastHeartbeatTimestamp < 0 || disconnectAlert.get());

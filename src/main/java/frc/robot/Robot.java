@@ -4,15 +4,17 @@
 
 package frc.robot;
 
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.livoniawarriors.GitVersion;
-//import org.livoniawarriors.Logger;
 
 import com.pathplanner.lib.util.PPLibTelemetry;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -23,12 +25,12 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
-    //public class Robot extends LoggedRobot {
+public class Robot extends LoggedRobot {
     public static final double kDefaultPeriod = 0.02;
     private Command m_autonomousCommand;
     private RobotContainer m_robotContainer;
-    //private Logger logger;
+    @SuppressWarnings("unused")
+    private Logger logger;
 
     /**
      * This function is run when the robot is first started up and should be used for any
@@ -39,17 +41,14 @@ public class Robot extends TimedRobot {
         DataLogManager.start();
 
         // Start AdvantageKit logger
-        //Logger.addDataReceiver(new NT4Publisher());
+        Logger.addDataReceiver(new NT4Publisher());
         //wpilog writer disable because it only logs the AdvantageKit table, not all signals
-        //Logger.addDataReceiver(new WPILOGWriter());
-        //Logger.start();
+        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.start();
     
         //display the Git info for the build in the network tables
         GitVersion.loadVersion().printVersions();
 
-        //internal logger class
-        //logger = new Logger();
-        //Logger.RegisterLoopTimes(this);
         SmartDashboard.putData(CommandScheduler.getInstance());
 
         /* This is a fix from 2023 with a Rio2.  We took a very hard hit and the Rio went into brownout
@@ -75,7 +74,7 @@ public class Robot extends TimedRobot {
         m_robotContainer.configureBindings();
 
         //start logging class after all the subsystems have initialized
-        //logger.start();
+        Logger.start();
     }
 
     /**

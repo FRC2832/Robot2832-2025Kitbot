@@ -6,7 +6,7 @@ See more documentation at [docs](src/main/java/org/livoniawarriors/docs/)
 
 By default, files that are changed by the user (like configurations for the Sim GUI or AdvantageScope) are on gitignore so they won't get checked in, but users can get default versions of these in the defaultconfig/ folder.
 
-Standard units:
+# Standard units:
 * X axis = robot forward positive, back negative
 * Y Axis = robot left positive, right negative
 * Z axis = robot up positive, down negative
@@ -14,5 +14,10 @@ Standard units:
 
 Robot logging is on by default, we use standard [WpiLog](https://docs.wpilib.org/en/stable/docs/software/telemetry/datalog.html) files from WpiLib.  To access the logs, insert a flash drive and they log automatically on there, or use Advantage Scope or the WpiLib Data Log Tool to get them off the robot.  The path should be /home/lvuser.  A standard SSH/SCP tool will work too, the username is lvuser, no password.
 
-Differences from standard projects:
+# Differences from standard projects:
 * Most teams have seperate folders for subsystems and commands.  Instead, we put all things related to the subsystem (both commands and subsystems) in the same folder, so it's easy to see what code is designed to work together.
+
+# Logging:
+We use AdvantageKit to log variables, you can use the annotation `@AutoLogOutput` to automatically log a variable, or if you need to give it a specific name due to multiple instances of the class, `@AutoLogOutput(key = "Camera {name}/lastReadTimestamp")`.  You probably need to add in `AutoLogOutputManager.addObject(this);`.
+
+See https://docs.advantagekit.org/data-flow/recording-outputs/annotation-logging
