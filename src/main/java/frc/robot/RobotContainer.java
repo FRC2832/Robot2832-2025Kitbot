@@ -122,6 +122,11 @@ public class RobotContainer {
             () -> MathUtil.applyDeadband(driverController.getLeftX() * -1, 0.05),
             () -> driverController.getRightX() * -1);
 
+        if (Robot.isSimulation()) {
+        new Trigger(driverController::getAButton).whileTrue(swerveDrive.driveToPose(new Pose2d(11.23, 4.15, Rotation2d.fromDegrees(0))));
+        new Trigger(driverController::getYButton).whileTrue(swerveDrive.driveToPose(new Pose2d(14.73, 4.49, Rotation2d.fromDegrees(120))));
+        }
+
         //setup default commands that are used for driving
         swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
         leds.setDefaultCommand(new RainbowLeds(leds).ignoringDisable(true));
