@@ -16,12 +16,9 @@ public class SwerveLock extends Command{
         
     }
     
+    @Override
     public void execute() {
         swerve.lock();
-    }
-
-    public void isfinished() {
-        
     }
 
 }
