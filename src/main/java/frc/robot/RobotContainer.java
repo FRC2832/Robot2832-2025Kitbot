@@ -130,8 +130,9 @@ public class RobotContainer {
         if (Robot.isSimulation()) {
             new Trigger(driverController::getAButton).whileTrue(swerveDrive.driveToPose(new Pose2d(11.23, 4.15, Rotation2d.fromDegrees(0))));
             new Trigger(driverController::getYButton).whileTrue(swerveDrive.driveToPose(new Pose2d(14.73, 4.49, Rotation2d.fromDegrees(120))));
-            new Trigger(driverController::getLeftStickButton).whileTrue(new SwerveLock(swerveDrive));
         }
+
+        new Trigger(driverController::getLeftStickButton).whileTrue(swerveDrive.swerveLock());
         
         //setup default commands that are used for driving
         swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
