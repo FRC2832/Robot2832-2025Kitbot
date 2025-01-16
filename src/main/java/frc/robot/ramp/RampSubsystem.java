@@ -36,6 +36,6 @@ public class RampSubsystem extends SubsystemBase {
     }
 
     public Command waitForPiece(){
-        return run();
+        return run(() -> {}).until(() -> this.pieceSeen);
     }
 }
