@@ -31,9 +31,11 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ramp.RampSubsystem;
+import frc.robot.swervedrive.SwerveLock;
 import frc.robot.swervedrive.SwerveSubsystem;
 import frc.robot.vision.AprilTagCamera;
 import frc.robot.vision.Vision;
+import swervelib.SwerveDrive;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -128,6 +130,7 @@ public class RobotContainer {
         if (Robot.isSimulation()) {
             new Trigger(driverController::getAButton).whileTrue(swerveDrive.driveToPose(new Pose2d(11.23, 4.15, Rotation2d.fromDegrees(0))));
             new Trigger(driverController::getYButton).whileTrue(swerveDrive.driveToPose(new Pose2d(14.73, 4.49, Rotation2d.fromDegrees(120))));
+            new Trigger(driverController::getLeftStickButton).whileTrue(new SwerveLock(swerveDrive));
         }
         
         //setup default commands that are used for driving
