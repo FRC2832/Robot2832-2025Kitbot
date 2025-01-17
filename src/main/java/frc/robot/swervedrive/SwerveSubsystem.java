@@ -744,4 +744,12 @@ public class SwerveSubsystem extends SubsystemBase
   public void addVisionMeasurement(Pose2d robotPose, double timestamp, Matrix<N3,N1> visionMeasurementStdDevs) {
     swerveDrive.addVisionMeasurement(robotPose, timestamp, visionMeasurementStdDevs);
   }
+
+  public void stop() {
+    swerveDrive.drive(new ChassisSpeeds());
+  }
+
+  public Command pushPartner() {
+    return new PushPartner(this);
+  }
 }

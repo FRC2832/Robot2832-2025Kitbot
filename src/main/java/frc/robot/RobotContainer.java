@@ -13,6 +13,7 @@ import org.livoniawarriors.leds.TestLeds;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -27,6 +28,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -102,6 +104,7 @@ public class RobotContainer {
 
         // Build an auto chooser. This will use Commands.none() as the default option.
         autoChooser = AutoBuilder.buildAutoChooser();
+        autoChooser.addOption("Push Partner", pushAndRunAuto());
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
@@ -129,7 +132,7 @@ public class RobotContainer {
             new Trigger(driverController::getAButton).whileTrue(swerveDrive.driveToPose(new Pose2d(11.23, 4.15, Rotation2d.fromDegrees(0))));
             new Trigger(driverController::getYButton).whileTrue(swerveDrive.driveToPose(new Pose2d(14.73, 4.49, Rotation2d.fromDegrees(120))));
         }
-        
+
         //setup default commands that are used for driving
         swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
         leds.setDefaultCommand(new RainbowLeds(leds).ignoringDisable(true));
@@ -143,5 +146,13 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
+    }
+
+    private Command pushAndRunAuto() {
+        PathPlannerAuto autoCommand = (PathPlannerAuto)AutoBuilder.buildAuto("Center-G-A");
+
+        return new InstantCommand(() -> swerveDrive.resetOdometry(autoCommand.getStartingPose()))
+            .andThen(swerveDrive.pushPartner())
+            .andThen(autoCommand);
     }
 }
