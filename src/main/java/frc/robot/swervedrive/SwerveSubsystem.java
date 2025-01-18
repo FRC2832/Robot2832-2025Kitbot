@@ -31,9 +31,12 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -743,7 +746,18 @@ public class SwerveSubsystem extends SubsystemBase
 
   public void addVisionMeasurement(Pose2d robotPose, double timestamp, Matrix<N3,N1> visionMeasurementStdDevs) {
     swerveDrive.addVisionMeasurement(robotPose, timestamp, visionMeasurementStdDevs);
+    SmartDashboard.putNumber("Frame Updates", update);
+    SmartDashboard.putNumber("Frame Std Dev", visionMeasurementStdDevs.get(0, 0));
+    SmartDashboard.putNumber("Frame Timestamp", timestamp);
+    if(publisher == null) {
+      publisher = NetworkTableInstance.getDefault().getStructTopic("Frame Pose", Pose2d.struct).publish();
+    }
+    publisher.set(robotPose);
+    update += 1;
   }
+
+  Integer update = 0;
+  StructPublisher<Pose2d> publisher;
 
   public Command swerveLock(){
     return new SwerveLock(this);

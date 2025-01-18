@@ -36,6 +36,7 @@ import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 
 public class AprilTagCamera {
@@ -256,10 +257,7 @@ public class AprilTagCamera {
       double mostRecentTimestamp = 0;
       double currentTimestamp    = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
       double debounceTime        = Milliseconds.of(15).in(Seconds);
-      for (PhotonPipelineResult result : resultsList)
-      {
-        mostRecentTimestamp = Math.max(mostRecentTimestamp, result.getTimestampSeconds());
-      }
+
       if ((resultsList.isEmpty() || (currentTimestamp - mostRecentTimestamp >= debounceTime)) &&
           (currentTimestamp - lastReadTimestamp) >= debounceTime)
       {
@@ -361,9 +359,11 @@ public class AprilTagCamera {
             estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
           } else
           {
-            estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+            //the closer we are, the better we make our standard devs
+            estStdDevs = singleTagStdDevs.times(avgDist / 4);
           }
           curStdDevs = estStdDevs;
+          SmartDashboard.putNumber("Std Dev", estStdDevs.get(0,0));
         }
       }
     }
