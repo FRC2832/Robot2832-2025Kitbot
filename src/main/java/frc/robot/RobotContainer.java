@@ -71,19 +71,21 @@ public class RobotContainer {
         }
 
         vision = new Vision(swerveDrive);
+        
         vision.addCamera(new AprilTagCamera("front",
             new Rotation3d(0, Units.degreesToRadians(0), Math.toRadians(0)),
             new Translation3d(0.363,
                                 0,
                                 0.31),
             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)));
+        /*
         vision.addCamera(new AprilTagCamera("rear",
             new Rotation3d(0, Units.degreesToRadians(-20), Math.toRadians(0)),
             new Translation3d(-0.363,
                                 0,
                                 0.5),
             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)));
-
+        */
         //add some buttons to press for development
         /*
         SmartDashboard.putData("Wheels Straight", new MoveWheels(swerveDrive, MoveWheels.WheelsStraight()));
