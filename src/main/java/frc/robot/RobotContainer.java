@@ -129,9 +129,9 @@ public class RobotContainer {
 
         if (Robot.isSimulation()) {
             new Trigger(driverController::getAButton).whileTrue(swerveDrive.driveToPose(new Pose2d(11.23, 4.15, Rotation2d.fromDegrees(0))));
-            new Trigger(driverController::getYButton).whileTrue(swerveDrive.driveToPose(new Pose2d(14.73, 4.49, Rotation2d.fromDegrees(120))));
+            new Trigger(driverController::getYButton).whileTrue(swerveDrive.finePosition(new Pose2d(2.75, 4.15, Rotation2d.fromDegrees(0))));
         } else {
-            new Trigger(driverController::getAButton).whileTrue(swerveDrive.driveToPose(new Pose2d(2.75, 4.15, Rotation2d.fromDegrees(0))));
+            new Trigger(driverController::getAButton).whileTrue(swerveDrive.finePosition(new Pose2d(2.75, 4.15, Rotation2d.fromDegrees(0))));
         }
         new Trigger(driverController::getLeftStickButton).whileTrue(swerveDrive.swerveLock());
         

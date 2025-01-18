@@ -26,6 +26,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -761,5 +762,18 @@ public class SwerveSubsystem extends SubsystemBase
 
   public Command swerveLock(){
     return new SwerveLock(this);
+  }
+
+  public Command finePosition(Pose2d targetPose) {
+    return this.driveToPose(targetPose)
+        .andThen(new FinePosition(this, targetPose));
+  }
+
+  public void setModuleStates(SwerveModuleState[] desiredStates, boolean isOpenLoop) {
+    var modules = swerveDrive.getModules();
+    for(var i=0; i<desiredStates.length; i++) {
+      modules[i].setDesiredState(desiredStates[i], isOpenLoop, true);
+    }
+    //swerveDrive.setModuleStates(desiredStates, isOpenLoop);
   }
 }
