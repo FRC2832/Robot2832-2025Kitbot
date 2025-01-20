@@ -34,4 +34,8 @@ public class RampSubsystem extends SubsystemBase {
     public Command runMotor(DoubleSupplier percent) {
         return run(() -> motor.set(ControlMode.PercentOutput, percent.getAsDouble()));
     }
+
+    public Command waitForPiece(){
+        return run(() -> {}).until(() -> this.pieceSeen);
+    }
 }
