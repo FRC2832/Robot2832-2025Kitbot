@@ -1,12 +1,9 @@
 package org.livoniawarriors.swerve;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 
-public  interface ISwerveDriveIo extends Subsystem {
+public  interface ISwerveDriveIo {
     void updateInputs();
     Translation2d[] getCornerLocations();
     String[] getModuleNames();
@@ -40,20 +37,17 @@ public  interface ISwerveDriveIo extends Subsystem {
      */
     double getCornerDistance(int wheel);
 
+    /**
+     * Sets the offset for the corner based on the configuration
+     * @param wheel
+     * @param angle
+     */
     void setCorrectedAngle(int wheel, double angle);
 
     void setCornerState(int wheel, SwerveModuleState swerveModuleState);
 
-    void SwerveDrive(double xSpeed, double ySpeed, double omega);
-    void SwerveDrive(double xSpeed, double ySpeed, double omega, boolean fieldOriented);
+    void resetWheelPositions();
 
-    void resetFieldOriented();
-
-    double getMaxDriverSpeed();
-    double getMaxDriverOmega();
-    double getMinSpeed();
-    SwerveModulePosition[] getSwervePositions();
-    void setWheelCommand(SwerveModuleState[] states);
-    SwerveDriveKinematics getKinematics();
-    SwerveModuleState[] getSwerveStates();
+    double getDriveVoltage(int wheel);
+    void setDriveVoltage(int wheel, double volts);
 }

@@ -5,10 +5,15 @@ import java.util.EnumSet;
 import java.util.function.Consumer;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.networktables.BooleanEntry;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
+import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleArrayTopic;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.DoubleSubscriber;
@@ -18,6 +23,9 @@ import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.IntegerTopic;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.networktables.StringTopic;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -147,6 +155,23 @@ public class UtilFunctions {
      * @param backup The value to use if the key is missing
      * @return The subscriber to get values from
      */
+    public static DoubleArraySubscriber getNtSub(String key, double[] backup) {
+        DoubleArrayTopic topic = NetworkTableInstance.getDefault().getDoubleArrayTopic(checkKey(key));
+        DoubleArrayPublisher pub = topic.publish();
+        pub.setDefault(backup);
+        DoubleArraySubscriber sub = topic.subscribe(backup);
+        if(!sub.exists()) {
+            pub.set(backup);
+        }
+        return sub;
+    }
+
+    /**
+     * This creates a NT subscriber so we don't have to keep querying the key in the table to get the value.
+     * @param key The parameter you want to get (slashes are allowed)
+     * @param backup The value to use if the key is missing
+     * @return The subscriber to get values from
+     */
     public static IntegerSubscriber getNtSub(String key, int backup) {
         IntegerTopic topic = NetworkTableInstance.getDefault().getIntegerTopic(checkKey(key));
         IntegerPublisher pub = topic.publish();
@@ -192,9 +217,33 @@ public class UtilFunctions {
      * @param key The parameter you want to get (slashes are allowed)
      * @return The publisher to put data in
      */
+    public static StringPublisher getNtPub(String key, String initValue) {
+        StringTopic topic = NetworkTableInstance.getDefault().getStringTopic(checkKey(key));
+        StringPublisher pub = topic.publish();
+        pub.setDefault(initValue);
+        return pub;
+    }
+
+    /**
+     * This creates a NT publisher so we don't have to keep querying the key in the table.
+     * @param key The parameter you want to get (slashes are allowed)
+     * @return The publisher to put data in
+     */
     public static DoublePublisher getNtPub(String key, double initValue) {
         DoubleTopic topic = NetworkTableInstance.getDefault().getDoubleTopic(checkKey(key));
         DoublePublisher pub = topic.publish();
+        pub.setDefault(initValue);
+        return pub;
+    }
+
+    /**
+     * This creates a NT publisher so we don't have to keep querying the key in the table.
+     * @param key The parameter you want to get (slashes are allowed)
+     * @return The publisher to put data in
+     */
+    public static IntegerPublisher getNtPub(String key, long initValue) {
+        IntegerTopic topic = NetworkTableInstance.getDefault().getIntegerTopic(checkKey(key));
+        IntegerPublisher pub = topic.publish();
         pub.setDefault(initValue);
         return pub;
     }
@@ -209,6 +258,13 @@ public class UtilFunctions {
         DoubleArrayPublisher pub = topic.publish();
         pub.setDefault(initValue);
         return pub;
+    }
+
+    public static BooleanEntry getNtEntry(String key, boolean initValue) {
+        BooleanTopic topic = NetworkTableInstance.getDefault().getBooleanTopic(checkKey(key));
+        BooleanEntry entry = topic.getEntry(initValue);
+        entry.setDefault(initValue);
+        return entry;
     }
 
     /**
@@ -249,7 +305,6 @@ public class UtilFunctions {
      * @param offsetSeconds What offset to run this function at
      * @return
      */
-    @SuppressWarnings("resource")
     public static boolean addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
         try {
             Field field = RobotBase.class.getDeclaredField("m_robotCopy");
@@ -261,5 +316,54 @@ public class UtilFunctions {
             //don't do anything, we just return false that it didn't schedule
         } 
         return false;
+    }
+
+    public static double getDistance(Pose2d pose1, Pose2d pose2) {
+        double xDist = pose1.getX() - pose2.getX();
+        double yDist = pose1.getY() - pose2.getY();
+        return Math.sqrt((xDist * xDist) + (yDist * yDist));
+    }
+
+    public static double getDistance(Pose3d pose1, Pose3d pose2) {
+        double xDist = pose1.getX() - pose2.getX();
+        double yDist = pose1.getY() - pose2.getY();
+        double zDist = pose1.getZ() - pose2.getZ();
+        return Math.sqrt((xDist * xDist) + (yDist * yDist) + (zDist * zDist));
+    }
+
+    public static double getDistance(Transform3d pose) {
+        double xDist = pose.getX();
+        double yDist = pose.getY();
+        double zDist = pose.getZ();
+        return Math.sqrt((xDist * xDist) + (yDist * yDist) + (zDist * zDist));
+    }
+
+    public static double getAngle(Pose2d pose1, Pose2d pose2) {
+        double xDist = pose1.getX() - pose2.getX();
+        double yDist = pose1.getY() - pose2.getY();
+        double angle = Math.atan(yDist/xDist);
+        return angle;
+    }
+    
+    public static double LimitChange(double current, double target, double maxChangePerLoop) {
+        double delta = target - current;
+        double newValue;
+
+        if(Math.abs(delta) > maxChangePerLoop) {  
+            newValue = current + Math.copySign(maxChangePerLoop, delta);
+        } else {
+            newValue = target;
+        }
+        return newValue;
+    }
+
+    /* TODO: Move this for next season, in VisionSystem for now */
+    private static Alliance alliance;
+    public static Alliance getAlliance() {
+        return alliance;
+    }
+
+    public static void setAlliance(Alliance alliance) {
+        UtilFunctions.alliance = alliance;
     }
 }
