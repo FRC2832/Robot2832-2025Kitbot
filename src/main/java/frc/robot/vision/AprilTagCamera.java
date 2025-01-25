@@ -106,6 +106,8 @@ public class AprilTagCamera {
     @SuppressWarnings("unused")
     private int heartbeatHandle;
 
+    private boolean aprilTagDetection = false;
+
     /**
      * Construct a Photon Camera class with help. Standard deviations are fake values, experiment and determine
      * estimation noise on an actual robot.
@@ -243,11 +245,31 @@ public class AprilTagCamera {
         disconnectAlert.set(false);
       }
 
-      //check pose
-      updateUnreadResults();
+      if (aprilTagDetection) {
+        //check pose
+        updateUnreadResults();
+      } else {
+        //color detection
+        colorDetection();
+      }
       return estimatedRobotPose;
     }
 
+    List<ColorMatchResult> colorTargets = new ArrayList<ColorMatchResult>();
+    private void colorDetection() {
+      // Query the latest result from PhotonVision
+      PhotonPipelineResult result = camera.getLatestResult();
+      List<PhotonTrackedTarget> targets = result.getTargets();
+      colorTargets = new ArrayList<ColorMatchResult>();
+      for (PhotonTrackedTarget target : targets) {
+        //TODO: Get actual frame sizes
+        colorTargets.add(new ColorMatchResult(target, 960, 720));
+      }
+    }
+
+    public List<ColorMatchResult> getColorTargets() {
+      return colorTargets;
+    }
 
     /**
      * Update the latest results, cached with a maximum refresh rate of 1req/15ms. Sorts the list by timestamp.
