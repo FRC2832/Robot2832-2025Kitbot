@@ -30,6 +30,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.leds.FrontLeds;
+import frc.robot.leds.RearLeds;
+import frc.robot.leds.ShowTargetInfo;
 import frc.robot.ramp.RampSubsystem;
 import frc.robot.swervedrive.SwerveSubsystem;
 import frc.robot.vision.AprilTagCamera;
@@ -45,12 +48,15 @@ public class RobotContainer {
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     private SwerveSubsystem swerveDrive;
     private RampSubsystem rampSubsystem;
-    private LedSubsystem leds;
+    private FrontLeds frontLeds;
+    private RearLeds rearLeds;
     private Vision vision;
 
     private XboxController driverController;
 
     private SendableChooser<Command> autoChooser;
+
+    private AprilTagCamera frontCamera;
 
     public RobotContainer() {
         driverController = new XboxController(0);
@@ -58,7 +64,8 @@ public class RobotContainer {
         String swerveDirectory = "swerve/kitbot";
         //subsystems used in all robots
         swerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), swerveDirectory));
-        leds = new LedSubsystem(6, 54);
+        frontLeds = new FrontLeds(6, 54);
+        rearLeds = new RearLeds(frontLeds);
         rampSubsystem = new RampSubsystem();
         if(Robot.isSimulation()) {
             //drive fast in simulation
@@ -71,13 +78,14 @@ public class RobotContainer {
         }
 
         vision = new Vision(swerveDrive);
-        
-        vision.addCamera(new AprilTagCamera("front",
+        frontCamera = new AprilTagCamera("front",
             new Rotation3d(0, Units.degreesToRadians(0), Math.toRadians(0)),
             new Translation3d(0.363,
                                 0,
                                 0.31),
-            VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)));
+            VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+
+        vision.addCamera(frontCamera);
         /*
         vision.addCamera(new AprilTagCamera("rear",
             new Rotation3d(0, Units.degreesToRadians(-20), Math.toRadians(0)),
@@ -94,11 +102,11 @@ public class RobotContainer {
         SmartDashboard.putData("Drive Wheels Straight", new MoveWheels(swerveDrive, MoveWheels.DriveWheelsStraight()));
         SmartDashboard.putData("Drive Wheels Diamond", new MoveWheels(swerveDrive, MoveWheels.DriveWheelsDiamond()));
         */
-        SmartDashboard.putData("Test Leds", new TestLeds(leds));
+        //SmartDashboard.putData("Test Leds", new TestLeds(leds));
 
         // Register Named Commands for PathPlanner
-        NamedCommands.registerCommand("flashRed", new LightningFlash(leds, Color.kFirstRed));
-        NamedCommands.registerCommand("flashBlue", new LightningFlash(leds, Color.kFirstBlue));
+        //NamedCommands.registerCommand("flashRed", new LightningFlash(leds, Color.kFirstRed));
+        //NamedCommands.registerCommand("flashBlue", new LightningFlash(leds, Color.kFirstBlue));
         NamedCommands.registerCommand("ScorePieceL1", new WaitCommand(1));
         NamedCommands.registerCommand("GetFromHP", new WaitCommand(2));
 
@@ -137,7 +145,10 @@ public class RobotContainer {
         
         //setup default commands that are used for driving
         swerveDrive.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-        leds.setDefaultCommand(new RainbowLeds(leds).ignoringDisable(true));
+        //leds.setDefaultCommand(new RainbowLeds(leds).ignoringDisable(true));
+        frontLeds.setDefaultCommand(new ShowTargetInfo(frontLeds, frontCamera, Color.fromHSV(75, 255, 255)));
+        rearLeds.setDefaultCommand(new ShowTargetInfo(rearLeds, frontCamera, Color.fromHSV(75, 255, 255)));
+        //rearLeds.setDefaultCommand(new TestLeds(rearLeds));
         rampSubsystem.setDefaultCommand(rampSubsystem.runMotor(() -> (driverController.getRightTriggerAxis() * 0.35) - (driverController.getLeftTriggerAxis() * 0.35)));
     }
 
