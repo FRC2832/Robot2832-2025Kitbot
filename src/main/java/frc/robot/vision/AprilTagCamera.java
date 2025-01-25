@@ -106,6 +106,8 @@ public class AprilTagCamera {
     @SuppressWarnings("unused")
     private int heartbeatHandle;
 
+    private CameraType cameraType;
+
     /**
      * Construct a Photon Camera class with help. Standard deviations are fake values, experiment and determine
      * estimation noise on an actual robot.
@@ -125,6 +127,7 @@ public class AprilTagCamera {
       latencyAlert = new Alert("'" + name + "' Camera is experiencing high latency.", AlertType.kWarning);
       disconnectAlert = new Alert("'" + name + "' Camera is disconnected.", AlertType.kError);
       lastHeartbeatTimestamp = -1;
+      cameraType = CameraType.APRILTAGS;
 
       camera = new PhotonCamera(name);
 
@@ -141,7 +144,7 @@ public class AprilTagCamera {
 
       this.singleTagStdDevs = singleTagStdDevs;
       this.multiTagStdDevs = multiTagStdDevsMatrix;
-
+      
       // add a listener to listen for heartbeat changes
       heartbeatSub = camera.getCameraTable().getIntegerTopic("heartbeat").subscribe(0);
       heartbeatHandle = NetworkTableInstance.getDefault().addListener(
@@ -243,11 +246,34 @@ public class AprilTagCamera {
         disconnectAlert.set(false);
       }
 
-      //check pose
-      updateUnreadResults();
+      if (cameraType == CameraType.APRILTAGS) {
+        //check pose
+        updateUnreadResults();
+      } else if (cameraType == CameraType.ALGAE) {
+        //color detection
+        colorDetection();
+      } else {
+        //do no processing
+      }
+
       return estimatedRobotPose;
     }
 
+    List<ColorMatchResult> colorTargets = new ArrayList<ColorMatchResult>();
+    private void colorDetection() {
+      // Query the latest result from PhotonVision
+      PhotonPipelineResult result = camera.getLatestResult();
+      List<PhotonTrackedTarget> targets = result.getTargets();
+      colorTargets = new ArrayList<ColorMatchResult>();
+      for (PhotonTrackedTarget target : targets) {
+        //TODO: Get actual frame sizes
+        colorTargets.add(new ColorMatchResult(target, 960, 720));
+      }
+    }
+
+    public List<ColorMatchResult> getColorTargets() {
+      return colorTargets;
+    }
 
     /**
      * Update the latest results, cached with a maximum refresh rate of 1req/15ms. Sorts the list by timestamp.
@@ -377,5 +403,23 @@ public class AprilTagCamera {
     public boolean isConnected() {
       //if we have never seen the camera yet, or if the disconnect alert goes active
       return !(lastHeartbeatTimestamp < 0 || disconnectAlert.get());
+    }
+
+    public void setPipeLine(CameraType type) {
+      if (type == CameraType.DRIVER_CAM) {
+        camera.setDriverMode(true);
+      } else {
+        camera.setDriverMode(false);
+
+        if (type == CameraType.APRILTAGS) {
+          camera.setPipelineIndex(0);
+        } else if (type == CameraType.ALGAE) {
+          camera.setPipelineIndex(1);
+        }
+      }
+    }
+
+    public CameraType getPipeLineType() {
+      return cameraType;
     }
 }
