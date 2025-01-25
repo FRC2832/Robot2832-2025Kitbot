@@ -55,6 +55,7 @@ import org.livoniawarriors.UtilFunctions;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
+import swervelib.SwerveModule;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
@@ -110,6 +111,7 @@ public class SwerveSubsystem extends SubsystemBase
       swerveDrive.stopOdometryThread();
     }
     setupPathPlanner();
+    setMotorBrake(true);
   }
   
 
@@ -774,6 +776,9 @@ public class SwerveSubsystem extends SubsystemBase
     for(var i=0; i<desiredStates.length; i++) {
       modules[i].setDesiredState(desiredStates[i], isOpenLoop, true);
     }
-    //swerveDrive.setModuleStates(desiredStates, isOpenLoop);
+  }
+
+  public SwerveModule[] getModules() {
+    return swerveDrive.getModules();
   }
 }
